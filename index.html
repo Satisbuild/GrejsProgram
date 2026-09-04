@@ -6,7 +6,6 @@
 <title>Træningslog</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root{
     --bg:#12151b;
@@ -23,7 +22,7 @@
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
     font-family:'Inter',sans-serif; overscroll-behavior-y:none;}
-  h1,h2,h3,.brand,.setlabel,.tabbtn{font-family:'Oswald',sans-serif;}
+  h1,h2,h3,.brand,.tabbtn{font-family:'Oswald',sans-serif;}
 
   header{
     position:sticky; top:0; z-index:20;
@@ -32,7 +31,7 @@
   }
   .brand{font-size:22px; font-weight:700; letter-spacing:.5px; margin:0 0 12px;
     display:flex; align-items:baseline; gap:8px;}
-  .brand span{color:var(--chalk); font-size:14px; font-weight:500; color:var(--text-dim);}
+  .brand span{font-size:14px; font-weight:500; color:var(--text-dim);}
 
   .tabs{display:flex; gap:8px; background:var(--panel); padding:5px; border-radius:12px;}
   .tabbtn{flex:1; text-align:center; padding:10px 4px; border-radius:9px; border:none;
@@ -42,42 +41,59 @@
 
   main{padding:14px 16px 140px; max-width:640px; margin:0 auto;}
 
-  .daymeta{display:flex; justify-content:space-between; align-items:center; margin:14px 2px 10px;}
+  .daymeta{display:flex; justify-content:space-between; align-items:center; margin:14px 2px 10px; gap:10px;}
   .daymeta .date{color:var(--text-dim); font-size:13px;}
-  .daymeta .last-saved{color:var(--teal); font-size:12px;}
+  .daymeta .last-saved{color:var(--teal); font-size:12px; text-align:right; white-space:nowrap;}
 
   .card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
     margin-bottom:12px; overflow:hidden;}
   .card-head{display:flex; align-items:center; gap:12px; padding:14px 14px 10px;}
   .icon{width:34px; height:34px; flex:none; color:var(--chalk); opacity:.9;}
+  .titlewrap{position:relative; flex:1; min-width:0;}
   .card-head h3{margin:0; font-size:17px; font-weight:600; letter-spacing:.2px;}
+  .card-head h3 .caret{color:var(--text-dim); font-size:12px; margin-left:5px; vertical-align:middle;}
   .card-head .meta{font-size:12.5px; color:var(--text-dim); margin-top:2px;}
+  /* Usynlig native dropdown ovenpå titlen */
+  .exsel{position:absolute; inset:0; width:100%; height:100%;
+    opacity:0; border:none; background:transparent; font-size:16px; cursor:pointer;}
   .superset-tag{font-size:11px; color:var(--teal); border:1px solid var(--teal);
-    border-radius:20px; padding:2px 8px; margin-left:auto; white-space:nowrap;}
+    border-radius:20px; padding:2px 8px; white-space:nowrap;}
+  .delbtn{flex:none; width:26px; height:26px; border-radius:8px; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--text-dim); font-size:15px; line-height:1; cursor:pointer;}
 
-  .sets{padding:0 14px 12px;}
-  .setrow{display:grid; grid-template-columns:26px 1fr 1fr auto; gap:8px; align-items:center;
-    padding:7px 0; border-top:1px solid var(--line);}
+  .sets{padding:0 12px 4px;}
+  .grid{display:grid; grid-template-columns:18px 38px 1fr 38px 1fr 22px; gap:5px; align-items:center;}
+  .setrow{padding:7px 0; border-top:1px solid var(--line);}
   .setrow:first-child{border-top:none;}
   .setnum{color:var(--text-dim); font-size:13px; font-weight:600;}
+  .last{font-size:13px; color:#4b5361; text-align:center; font-weight:600; overflow:hidden;}
+  .last.has{color:var(--chalk);}
   .field{position:relative;}
   .field input{width:100%; background:var(--panel-2); border:1px solid var(--line);
     border-radius:9px; color:var(--text); font-size:16px; font-weight:600;
-    padding:9px 8px 9px 9px; text-align:center;}
+    padding:9px 4px; text-align:center;}
   .field input::placeholder{color:#4b5361; font-weight:500;}
-  .field .unit{position:absolute; right:9px; top:50%; transform:translateY(-50%);
-    font-size:11px; color:var(--text-dim); pointer-events:none;}
-  .field.weight input{padding-right:26px;}
-  .repcell{font-size:12.5px; color:var(--text-dim); text-align:center;}
   .done{width:22px; height:22px; border-radius:6px; border:1.5px solid var(--line);
-    background:var(--panel-2); cursor:pointer; display:flex; align-items:center; justify-content:center;}
+    background:var(--panel-2); cursor:pointer; display:flex; align-items:center;
+    justify-content:center; padding:0;}
   .done.checked{background:var(--teal); border-color:var(--teal);}
   .done.checked::after{content:"✓"; color:#0d1b18; font-size:14px; font-weight:700;}
 
+  .cardfoot{display:flex; gap:8px; padding:2px 14px 12px;}
+  .minibtn{background:var(--panel-2); border:1px solid var(--line); color:var(--text-dim);
+    border-radius:8px; padding:6px 10px; font-size:12px; cursor:pointer;}
+
   .note{padding:0 14px 12px; font-size:12.5px; color:var(--text-dim); font-style:italic;}
 
-  .col-labels{display:grid; grid-template-columns:26px 1fr 1fr auto; gap:8px;
-    padding:0 14px; font-size:10.5px; color:#5c6473; text-transform:uppercase; letter-spacing:.5px;}
+  .col-labels{padding:0 12px 2px; font-size:10px; color:#5c6473;
+    text-transform:uppercase; letter-spacing:.4px;}
+  .col-labels span{text-align:center; overflow:hidden;}
+  .col-labels .sidst{color:#6f6338;}
+
+  .addbtn{width:100%; background:var(--panel); border:1px dashed var(--line); color:var(--text-dim);
+    border-radius:var(--radius); padding:14px; font-size:14px; font-weight:600; cursor:pointer;}
+  .restorebtn{display:block; margin:14px auto 0; background:none; border:none;
+    color:#5c6473; font-size:12px; text-decoration:underline; cursor:pointer;}
 
   footer{
     position:fixed; bottom:0; left:0; right:0; z-index:30;
@@ -93,10 +109,8 @@
   .toast{position:fixed; left:50%; bottom:90px; transform:translateX(-50%) translateY(20px);
     background:var(--teal); color:#0d1b18; font-weight:600; font-size:14px;
     padding:10px 18px; border-radius:30px; opacity:0; transition:.25s; z-index:40; pointer-events:none;
-    white-space:nowrap;}
+    max-width:90vw; text-align:center;}
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
-
-  #capture-frame{background:var(--bg);}
 </style>
 </head>
 <body>
@@ -106,25 +120,27 @@
   <div class="tabs" id="tabs"></div>
 </header>
 
-<main id="capture-frame">
+<main>
   <div class="daymeta">
     <span class="date" id="daysubtitle"></span>
     <span class="last-saved" id="lastSavedLabel"></span>
   </div>
   <div id="exerciseList"></div>
+  <button class="addbtn" id="addExBtn">＋ Tilføj øvelse</button>
+  <button class="restorebtn" id="restoreBtn">Gendan standardprogram for denne dag</button>
 </main>
 
 <footer>
   <div class="footwrap">
-    <button class="btn btn-ghost" id="resetBtn" title="Ryd dagens felter">↺</button>
-    <button class="btn btn-primary" id="saveImgBtn">Gem billede af træning</button>
+    <button class="btn btn-ghost" id="resetBtn" title="Ryd felterne">↺</button>
+    <button class="btn btn-primary" id="saveBtn">Gem træning</button>
   </div>
 </footer>
 
 <div class="toast" id="toast"></div>
 
 <script>
-/* ---------- Ikoner (simple, licensfrie SVG-linjeikoner) ---------- */
+/* ---------- Ikoner ---------- */
 const ICONS = {
   barbell: `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><rect x="4" y="20" width="6" height="8"/><rect x="12" y="17" width="4" height="14"/><rect x="18" y="21" width="12" height="6"/><rect x="32" y="17" width="4" height="14"/><rect x="38" y="20" width="6" height="8"/></svg>`,
   machine: `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="10" width="10" height="28" rx="2"/><path d="M16 16h10l8 8"/><circle cx="36" cy="26" r="6"/></svg>`,
@@ -132,47 +148,150 @@ const ICONS = {
   legs: `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6h6l1 16 4 18h-6l-3-14-4 14h-6l4-20z"/></svg>`,
   dumbbell: `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><rect x="6" y="18" width="6" height="12"/><rect x="14" y="21" width="20" height="6"/><rect x="36" y="18" width="6" height="12"/></svg>`,
   row: `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 34h10l6-10 6 4 12-14"/><circle cx="40" cy="12" r="4"/></svg>`,
+  body: `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="9" r="5"/><path d="M24 14v16M24 30l-7 12M24 30l7 12M10 20l14 4 14-4"/></svg>`,
 };
 
-/* ---------- Program ---------- */
+/* ---------- Øvelsesbibliotek (dropdown) ---------- */
+const LIBRARY = {
+  bryst: { label:"Bryst", items:[
+    {name:"Bænkpres (tung)", icon:"barbell", reps:"3-5"},
+    {name:"Bænkpres (stang)", icon:"barbell", reps:"5-8"},
+    {name:"Pause-bænk", icon:"barbell", reps:"5-7"},
+    {name:"Bænkpres (håndvægte)", icon:"dumbbell", reps:"6-10"},
+    {name:"Bænkpres (maskine)", icon:"machine", reps:"6-10"},
+    {name:"Bænkpres (Smith)", icon:"barbell", reps:"6-10"},
+    {name:"Incline bænkpres (stang)", icon:"barbell", reps:"5-8"},
+    {name:"Incline bænkpres (håndvægte)", icon:"dumbbell", reps:"6-10"},
+    {name:"Incline bænkpres (maskine)", icon:"machine", reps:"5-7"},
+    {name:"Incline bænkpres (Smith)", icon:"barbell", reps:"6-10"},
+    {name:"Decline bænkpres", icon:"barbell", reps:"6-10"},
+    {name:"Chest press (maskine)", icon:"machine", reps:"8-12"},
+    {name:"Flyes – fokus øvre bryst", icon:"dumbbell", reps:"5-7"},
+    {name:"Flyes (håndvægte)", icon:"dumbbell", reps:"8-12"},
+    {name:"Cable flyes (lav til høj)", icon:"cable", reps:"10-12"},
+    {name:"Cable flyes (høj til lav)", icon:"cable", reps:"10-12"},
+    {name:"Pec deck (maskine)", icon:"machine", reps:"10-12"},
+    {name:"Dips (bryst)", icon:"body", reps:"6-12"},
+    {name:"Push ups", icon:"body", reps:"AMRAP"},
+  ]},
+  skuldre: { label:"Skuldre", items:[
+    {name:"Skulderpres (håndvægte)", icon:"dumbbell", reps:"6-10"},
+    {name:"Skulderpres (maskine)", icon:"machine", reps:"8-12"},
+    {name:"Militærpres (stang)", icon:"barbell", reps:"5-8"},
+    {name:"Arnold press", icon:"dumbbell", reps:"8-12"},
+    {name:"Lateral raise (maskine)", icon:"machine", reps:"7-10"},
+    {name:"Lateral raise (håndvægte)", icon:"dumbbell", reps:"10-15"},
+    {name:"Cable lateral raise", icon:"cable", reps:"10-15"},
+    {name:"Front raise", icon:"dumbbell", reps:"10-12"},
+    {name:"Reverse pec deck", icon:"machine", reps:"12-15"},
+    {name:"Face pull", icon:"cable", reps:"10-12"},
+    {name:"Upright row", icon:"cable", reps:"8-12"},
+    {name:"Shrugs (håndvægte)", icon:"dumbbell", reps:"10-12"},
+  ]},
+  triceps: { label:"Triceps", items:[
+    {name:"Close grip bænk (Smith) – triceps", icon:"barbell", reps:"7-10"},
+    {name:"Close grip bænkpres", icon:"barbell", reps:"6-10"},
+    {name:"Triceps pushdown", icon:"cable", reps:"8-12"},
+    {name:"Triceps pushdown (reb)", icon:"cable", reps:"10-12"},
+    {name:"Overhead triceps ext. (reb)", icon:"cable", reps:"10-12"},
+    {name:"Skullcrusher", icon:"barbell", reps:"8-12"},
+    {name:"Triceps ext. (maskine)", icon:"machine", reps:"8-12"},
+    {name:"Triceps kickback", icon:"dumbbell", reps:"10-15"},
+    {name:"Dips (triceps)", icon:"body", reps:"6-12"},
+  ]},
+  ryg: { label:"Ryg", items:[
+    {name:"Lat pullover", icon:"cable", reps:"10-12"},
+    {name:"T-bar row", icon:"row", reps:"5-8"},
+    {name:"Barbell row", icon:"row", reps:"6-10"},
+    {name:"Håndvægt row (1-arms)", icon:"dumbbell", reps:"8-12"},
+    {name:"Chest supported row", icon:"machine", reps:"8-12"},
+    {name:"Seated cable row", icon:"cable", reps:"8-12"},
+    {name:"Machine row", icon:"machine", reps:"8-12"},
+    {name:"Lat pulldown", icon:"cable", reps:"8-10"},
+    {name:"Lat pulldown (smalt greb)", icon:"cable", reps:"8-12"},
+    {name:"Pull ups", icon:"body", reps:"AMRAP"},
+    {name:"Straight arm pulldown", icon:"cable", reps:"10-12"},
+    {name:"Rack pull", icon:"barbell", reps:"5-8"},
+    {name:"Dødløft", icon:"barbell", reps:"3-6"},
+    {name:"Hyperextension", icon:"body", reps:"10-15"},
+    {name:"Shrugs (stang)", icon:"barbell", reps:"8-12"},
+  ]},
+  biceps: { label:"Biceps & underarme", items:[
+    {name:"Biceps curl", icon:"dumbbell", reps:"8-12"},
+    {name:"Biceps curl (stang)", icon:"barbell", reps:"8-12"},
+    {name:"Hammer curl", icon:"dumbbell", reps:"8-12"},
+    {name:"Incline curl", icon:"dumbbell", reps:"10-12"},
+    {name:"Preacher curl (maskine)", icon:"machine", reps:"8-12"},
+    {name:"Cable curl", icon:"cable", reps:"10-12"},
+    {name:"Concentration curl", icon:"dumbbell", reps:"10-12"},
+    {name:"Reverse curl", icon:"barbell", reps:"10-12"},
+    {name:"Behind the back forearm", icon:"cable", reps:"8-10"},
+    {name:"Wrist curl", icon:"dumbbell", reps:"12-15"},
+  ]},
+  ben: { label:"Ben", items:[
+    {name:"Hacksquat", icon:"legs", reps:"5-8"},
+    {name:"Squat (stang)", icon:"barbell", reps:"5-8"},
+    {name:"Front squat", icon:"barbell", reps:"5-8"},
+    {name:"Benpres", icon:"machine", reps:"8-12"},
+    {name:"Goblet squat", icon:"dumbbell", reps:"8-12"},
+    {name:"Bulgarian split squat", icon:"dumbbell", reps:"8-12"},
+    {name:"Lunges", icon:"dumbbell", reps:"10-12"},
+    {name:"Romanian deadlift", icon:"barbell", reps:"6-10"},
+    {name:"Lying leg curl", icon:"machine", reps:"8-10"},
+    {name:"Seated leg curl", icon:"machine", reps:"8-12"},
+    {name:"Leg extension", icon:"machine", reps:"8-10"},
+    {name:"Hip thrust", icon:"barbell", reps:"8-12"},
+    {name:"Calf raises", icon:"legs", reps:"8-10"},
+    {name:"Calf raises (siddende)", icon:"machine", reps:"10-15"},
+    {name:"Adduktor (maskine)", icon:"machine", reps:"12-15"},
+    {name:"Abduktor (maskine)", icon:"machine", reps:"12-15"},
+  ]},
+  core: { label:"Mave & andet", items:[
+    {name:"Ab crunches (cable)", icon:"cable", reps:"8-10"},
+    {name:"Ab machine crunch", icon:"machine", reps:"10-15"},
+    {name:"Hanging leg raise", icon:"body", reps:"8-15"},
+    {name:"Plank", icon:"body", reps:"sek"},
+    {name:"Russian twist", icon:"dumbbell", reps:"15-20"},
+    {name:"Cable woodchopper", icon:"cable", reps:"10-12"},
+    {name:"Ekstra sæt – til failure", icon:"legs", reps:"AMRAP"},
+  ]},
+};
+
+/* ---------- Standardprogram ---------- */
 const PROGRAM = {
   bryst: {
-    label: "Bryst", subtitle: "Bænk · Incline · Flyes · Triceps",
-    exercises: [
-      {name:"Bænkpres (tung)", icon:"barbell", sets:[{reps:"3-5"},{reps:"3-5"}]},
-      {name:"Pause-bænk", icon:"barbell", sets:[{reps:"5-7"},{reps:"5-7"}]},
-      {name:"Incline bænkpres (maskine)", icon:"machine", sets:[{reps:"5-7"},{reps:"5-7"},{reps:"5-7"},{reps:"5-7"}]},
-      {name:"Flyes – fokus øvre bryst", icon:"dumbbell", sets:[{reps:"5-7"},{reps:"5-7"},{reps:"5-7"}]},
-      {name:"Close grip bænk (Smith) – triceps", icon:"barbell", sets:[{reps:"7-10"},{reps:"7-10"},{reps:"7-10"}]},
-      {name:"Lateral raise (maskine)", icon:"machine", superset:"Superset A", note:"Skiftevis med Triceps pushdown",
-        sets:[{reps:"7-10"},{reps:"7-10"},{reps:"7-10"},{reps:"7-10"}]},
-      {name:"Triceps pushdown", icon:"cable", superset:"Superset A", note:"Skiftevis med Lateral raise",
-        sets:[{reps:"8-12"},{reps:"8-12"},{reps:"8-12"},{reps:"8-12"}]},
+    label:"Bryst", subtitle:"Bænk · Incline · Flyes · Triceps",
+    exercises:[
+      {name:"Bænkpres (tung)", icon:"barbell", reps:"3-5", n:2},
+      {name:"Pause-bænk", icon:"barbell", reps:"5-7", n:2},
+      {name:"Incline bænkpres (maskine)", icon:"machine", reps:"5-7", n:4},
+      {name:"Flyes – fokus øvre bryst", icon:"dumbbell", reps:"5-7", n:3},
+      {name:"Close grip bænk (Smith) – triceps", icon:"barbell", reps:"7-10", n:3},
+      {name:"Lateral raise (maskine)", icon:"machine", reps:"7-10", n:4, superset:"Superset A", note:"Skiftevis med Triceps pushdown"},
+      {name:"Triceps pushdown", icon:"cable", reps:"8-12", n:4, superset:"Superset A", note:"Skiftevis med Lateral raise"},
     ]
   },
   ben: {
-    label: "Ben", subtitle: "Hacksquat · Curl · Extension · Calves",
-    exercises: [
-      {name:"Hacksquat", icon:"legs", sets:[{reps:"5-8"},{reps:"5-8"},{reps:"5-8"},{reps:"5-8"}]},
-      {name:"Lying leg curl", icon:"machine", sets:[{reps:"8-10"},{reps:"8-10"},{reps:"8-10"},{reps:"8-10"}]},
-      {name:"Leg extension", icon:"machine", sets:[{reps:"8-10"},{reps:"8-10"},{reps:"8-10"}]},
-      {name:"Calf raises", icon:"legs", superset:"Superset A", note:"Skiftevis med Ab crunches (cable)",
-        sets:[{reps:"8-10"},{reps:"8-10"},{reps:"8-10"},{reps:"8-10"}]},
-      {name:"Ab crunches (cable)", icon:"cable", superset:"Superset A", note:"Skiftevis med Calf raises",
-        sets:[{reps:"8-10"},{reps:"8-10"},{reps:"8-10"},{reps:"8-10"}]},
-      {name:"Ekstra sæt – til failure", icon:"legs", note:"Kør kun hvis der er mere i tanken", sets:[{reps:"AMRAP"}]},
+    label:"Ben", subtitle:"Hacksquat · Curl · Extension · Calves",
+    exercises:[
+      {name:"Hacksquat", icon:"legs", reps:"5-8", n:4},
+      {name:"Lying leg curl", icon:"machine", reps:"8-10", n:4},
+      {name:"Leg extension", icon:"machine", reps:"8-10", n:3},
+      {name:"Calf raises", icon:"legs", reps:"8-10", n:4, superset:"Superset A", note:"Skiftevis med Ab crunches (cable)"},
+      {name:"Ab crunches (cable)", icon:"cable", reps:"8-10", n:4, superset:"Superset A", note:"Skiftevis med Calf raises"},
+      {name:"Ekstra sæt – til failure", icon:"legs", reps:"AMRAP", n:1, note:"Kør kun hvis der er mere i tanken"},
     ]
   },
   ryg: {
-    label: "Ryg", subtitle: "Pullover · Row · Pulldown · Arme",
-    exercises: [
-      {name:"Lat pullover", icon:"cable", sets:[{reps:"10-12"},{reps:"10-12"},{reps:"10-12"},{reps:"10-12"}]},
-      {name:"T-bar row", icon:"row", sets:[{reps:"5-8"},{reps:"5-8"},{reps:"5-8"},{reps:"5-8"}]},
-      {name:"Lat pulldown", icon:"cable", sets:[{reps:"8-10"},{reps:"8-10"},{reps:"8-10"}]},
-      {name:"Face pull", icon:"cable", sets:[{reps:"10-12"},{reps:"10-12"},{reps:"10-12"}]},
-      {name:"Biceps curl", icon:"dumbbell", sets:[{reps:"8-12"},{reps:"8-12"},{reps:"8-12"}]},
-      {name:"Hammer curl", icon:"dumbbell", sets:[{reps:"8-12"},{reps:"8-12"},{reps:"8-12"}]},
-      {name:"Behind the back forearm", icon:"cable", sets:[{reps:"8-10"},{reps:"8-10"}]},
+    label:"Ryg", subtitle:"Pullover · Row · Pulldown · Arme",
+    exercises:[
+      {name:"Lat pullover", icon:"cable", reps:"10-12", n:4},
+      {name:"T-bar row", icon:"row", reps:"5-8", n:4},
+      {name:"Lat pulldown", icon:"cable", reps:"8-10", n:3},
+      {name:"Face pull", icon:"cable", reps:"10-12", n:3},
+      {name:"Biceps curl", icon:"dumbbell", reps:"8-12", n:3},
+      {name:"Hammer curl", icon:"dumbbell", reps:"8-12", n:3},
+      {name:"Behind the back forearm", icon:"cable", reps:"8-10", n:2},
     ]
   }
 };
@@ -180,17 +299,80 @@ const PROGRAM = {
 const DAY_ORDER = ["bryst","ben","ryg"];
 let currentDay = localStorage.getItem("tl_currentDay") || "bryst";
 
-/* ---------- Storage helpers ----------
-   Alt gemmes løbende og automatisk i localStorage, sæt for sæt.
-   Hvert sæt husker selv hvilken dato det sidst blev tastet ind på ("d").
-   Er datoen ikke i dag, vises tallet kun som et lysegråt hint (placeholder)
-   i stedet for en udfyldt værdi - så du altid starter med tomme felter
-   til en ny træning, men kan se hvad du kørte sidst. */
-const keyLog = d => `tl_log_${d}`;
+/* ---------- Storage ----------
+   w / r / done : det du taster ind lige nu (gemmes løbende som kladde)
+   pw / pr / pd : sidste GEMTE træning - vises i de to Sidst-kolonner.
+   Tallene rykker først over i Sidst når du trykker "Gem træning". */
+const keyLog   = d => `tl_log_${d}`;
+const keyPlan  = d => `tl_plan_${d}`;
+const keySaved = d => `tl_saved_${d}`;
 
-function loadJSON(key){ try{ return JSON.parse(localStorage.getItem(key)) || {}; }catch(e){ return {}; } }
+function loadJSON(key, fb){ try{ const v = JSON.parse(localStorage.getItem(key)); return v ?? fb; }catch(e){ return fb; } }
 function saveJSON(key, obj){ localStorage.setItem(key, JSON.stringify(obj)); }
 function todayISO(){ return new Date().toISOString().slice(0,10); }
+function setKey(name, si){ return `${name}#${si}`; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function has(v){ return v !== undefined && v !== null && v !== ""; }
+
+/* ---------- Migrering fra tidligere versioner ---------- */
+(function migrate(){
+  if(!localStorage.getItem("tl_migrated_v2")){
+    DAY_ORDER.forEach(d=>{
+      const log = loadJSON(keyLog(d), {}), out = {};
+      Object.keys(log).forEach(k=>{
+        const m = k.match(/^(\d+)-(\d+)$/);
+        if(m){ const ex = PROGRAM[d].exercises[+m[1]]; if(ex) out[setKey(ex.name, +m[2])] = log[k]; }
+        else out[k] = log[k];
+      });
+      saveJSON(keyLog(d), out);
+    });
+    localStorage.setItem("tl_migrated_v2","1");
+  }
+  if(!localStorage.getItem("tl_migrated_v3")){
+    const t = todayISO();
+    DAY_ORDER.forEach(d=>{
+      const log = loadJSON(keyLog(d), {});
+      Object.values(log).forEach(e=>{
+        if(e && e.d && e.d !== t && (has(e.w) || has(e.r))){
+          e.pw = e.w; e.pr = e.r; e.pd = e.d;
+          e.w = ""; e.r = ""; e.done = false;
+        }
+      });
+      saveJSON(keyLog(d), log);
+    });
+    localStorage.setItem("tl_migrated_v3","1");
+  }
+})();
+
+function defaultPlan(day){ return PROGRAM[day].exercises.map(e=>({...e})); }
+function getPlan(day){
+  const p = loadJSON(keyPlan(day), null);
+  return (Array.isArray(p) && p.length) ? p : defaultPlan(day);
+}
+function savePlan(day, plan){ saveJSON(keyPlan(day), plan); }
+function findInLibrary(name){
+  for(const g of Object.values(LIBRARY)){
+    const hit = g.items.find(i=>i.name === name);
+    if(hit) return hit;
+  }
+  return null;
+}
+
+/* ---------- Dropdown ---------- */
+function buildSelect(currentName){
+  const known = !!findInLibrary(currentName);
+  let html = `<select class="exsel">`;
+  if(!known) html += `<optgroup label="Din øvelse"><option selected>${esc(currentName)}</option></optgroup>`;
+  for(const g of Object.values(LIBRARY)){
+    html += `<optgroup label="${esc(g.label)}">`;
+    g.items.forEach(it=>{
+      html += `<option value="${esc(it.name)}"${(known && it.name===currentName)?" selected":""}>${esc(it.name)}</option>`;
+    });
+    html += `</optgroup>`;
+  }
+  html += `<optgroup label="Andet"><option value="__custom">➕ Egen øvelse…</option></optgroup></select>`;
+  return html;
+}
 
 /* ---------- Render ---------- */
 function renderTabs(){
@@ -204,31 +386,26 @@ function renderTabs(){
     tabs.appendChild(b);
   });
 }
-
-function fmtDate(){
-  const now = new Date();
-  return now.toLocaleDateString("da-DK", {weekday:"short", day:"numeric", month:"short"});
-}
+function fmtDate(){ return new Date().toLocaleDateString("da-DK",{weekday:"short", day:"numeric", month:"short"}); }
+function shortDate(iso){ return iso ? new Date(iso).toLocaleDateString("da-DK",{day:"numeric",month:"short"}) : ""; }
 
 function renderDay(){
   const day = PROGRAM[currentDay];
+  const plan = getPlan(currentDay);
   document.getElementById("daysubtitle").textContent = day.subtitle;
   document.getElementById("today").textContent = fmtDate();
 
-  const log = loadJSON(keyLog(currentDay));
-  const today = todayISO();
-
-  // find seneste dato der er logget for denne dag, undtagen i dag
-  const priorDates = Object.values(log).map(v=>v.d).filter(d=> d && d !== today);
-  const lastDate = priorDates.sort().pop();
-  document.getElementById("lastSavedLabel").textContent = lastDate
-    ? `Sidste træning: ${new Date(lastDate).toLocaleDateString("da-DK",{day:"numeric",month:"short"})} · gemmes automatisk`
-    : "Gemmes automatisk mens du taster";
+  const log = loadJSON(keyLog(currentDay), {});
+  const savedDate = localStorage.getItem(keySaved(currentDay))
+    || Object.values(log).map(v=>v && v.pd).filter(Boolean).sort().pop();
+  document.getElementById("lastSavedLabel").textContent = savedDate
+    ? `Sidst gemt: ${shortDate(savedDate)}`
+    : "Ingen gemte træninger endnu";
 
   const list = document.getElementById("exerciseList");
   list.innerHTML = "";
 
-  day.exercises.forEach((ex, ei)=>{
+  plan.forEach((ex, ei)=>{
     const card = document.createElement("div");
     card.className = "card";
 
@@ -236,11 +413,13 @@ function renderDay(){
     head.className = "card-head";
     head.innerHTML = `
       <div class="icon">${ICONS[ex.icon] || ICONS.barbell}</div>
-      <div>
-        <h3>${ex.name}</h3>
-        <div class="meta">${ex.sets.length} sæt${ex.sets[0] ? " · " + ex.sets[0].reps + " reps" : ""}</div>
+      <div class="titlewrap">
+        <h3>${esc(ex.name)}<span class="caret">▼</span></h3>
+        <div class="meta">${ex.n} sæt · ${esc(ex.reps)} reps</div>
+        ${buildSelect(ex.name)}
       </div>
-      ${ex.superset ? `<span class="superset-tag">${ex.superset}</span>` : ""}
+      ${ex.superset ? `<span class="superset-tag">${esc(ex.superset)}</span>` : ""}
+      <button class="delbtn" data-del="${ei}" title="Fjern øvelse">×</button>
     `;
     card.appendChild(head);
 
@@ -252,113 +431,183 @@ function renderDay(){
     }
 
     const labels = document.createElement("div");
-    labels.className = "col-labels";
-    labels.innerHTML = `<span></span><span>Kg</span><span>Reps</span><span></span>`;
+    labels.className = "col-labels grid";
+    labels.innerHTML = `<span></span><span class="sidst">Sidst</span><span>Kg</span><span class="sidst">Sidst</span><span>Reps</span><span></span>`;
     card.appendChild(labels);
 
     const setsWrap = document.createElement("div");
     setsWrap.className = "sets";
 
-    ex.sets.forEach((s, si)=>{
-      const id = `${ei}-${si}`;
-      const saved = log[id] || {};
-      const editedToday = saved.d === today;
-      // editeret i dag -> vis værdien i feltet (kan redigeres videre)
-      // editeret en tidligere dag -> vis den kun som placeholder-hint, feltet er tomt
-      const weightVal = editedToday ? (saved.w ?? '') : '';
-      const repVal    = editedToday ? (saved.r ?? '') : '';
-      const weightPh  = saved.w ?? '—';
+    for(let si=0; si<ex.n; si++){
+      const id = setKey(ex.name, si);
+      const s = log[id] || {};
+      const lastW = has(s.pw) ? s.pw : null;
+      const lastR = has(s.pr) ? s.pr : null;
+      const tip = s.pd ? `Sidste træning ${shortDate(s.pd)}` : "";
 
       const row = document.createElement("div");
-      row.className = "setrow";
+      row.className = "setrow grid";
       row.innerHTML = `
         <span class="setnum">${si+1}</span>
-        <div class="field weight">
-          <input type="number" inputmode="decimal" placeholder="${weightPh}" value="${weightVal}" data-id="${id}" data-field="w">
-          <span class="unit">kg</span>
-        </div>
+        <span class="last ${lastW!==null?'has':''}" title="${tip}">${lastW!==null?esc(lastW):"—"}</span>
         <div class="field">
-          <input type="number" inputmode="numeric" placeholder="${s.reps}" value="${repVal}" data-id="${id}" data-field="r">
+          <input type="number" inputmode="decimal" placeholder="${lastW!==null?esc(lastW):'kg'}" value="${esc(s.w ?? "")}" data-id="${esc(id)}" data-field="w">
         </div>
-        <button class="done ${editedToday && saved.done ? 'checked':''}" data-id="${id}"></button>
+        <span class="last ${lastR!==null?'has':''}" title="${tip}">${lastR!==null?esc(lastR):"—"}</span>
+        <div class="field">
+          <input type="number" inputmode="numeric" placeholder="${lastR!==null?esc(lastR):esc(ex.reps)}" value="${esc(s.r ?? "")}" data-id="${esc(id)}" data-field="r">
+        </div>
+        <button class="done ${s.done?'checked':''}" data-id="${esc(id)}"></button>
       `;
       setsWrap.appendChild(row);
-    });
-
+    }
     card.appendChild(setsWrap);
+
+    const foot = document.createElement("div");
+    foot.className = "cardfoot";
+    foot.innerHTML = `
+      <button class="minibtn" data-sets="minus" data-ex="${ei}">− sæt</button>
+      <button class="minibtn" data-sets="plus" data-ex="${ei}">+ sæt</button>
+    `;
+    card.appendChild(foot);
+
     list.appendChild(card);
   });
 
-  // wire inputs - gemmer automatisk ved hvert tastetryk, ingen knap nødvendig
+  wireEvents();
+}
+
+/* ---------- Events ---------- */
+function wireEvents(){
+  const list = document.getElementById("exerciseList");
+
   list.querySelectorAll("input").forEach(inp=>{
     inp.addEventListener("input", ()=>{
-      const log = loadJSON(keyLog(currentDay));
+      const log = loadJSON(keyLog(currentDay), {});
       const id = inp.dataset.id;
       log[id] = log[id] || {};
       log[id][inp.dataset.field] = inp.value;
-      log[id].d = todayISO();
       saveJSON(keyLog(currentDay), log);
     });
   });
+
   list.querySelectorAll(".done").forEach(btn=>{
     btn.addEventListener("click", ()=>{
-      const log = loadJSON(keyLog(currentDay));
+      const log = loadJSON(keyLog(currentDay), {});
       const id = btn.dataset.id;
       log[id] = log[id] || {};
       log[id].done = !log[id].done;
-      log[id].d = todayISO();
       saveJSON(keyLog(currentDay), log);
-      btn.classList.toggle("checked", log[id].done);
+      btn.classList.toggle("checked", !!log[id].done);
+    });
+  });
+
+  list.querySelectorAll(".exsel").forEach((sel, ei)=>{
+    sel.addEventListener("change", ()=>{
+      const p = getPlan(currentDay);
+      if(sel.value === "__custom"){
+        const navn = prompt("Navn på øvelsen:");
+        if(!navn){ renderDay(); return; }
+        p[ei] = {name:navn.trim(), icon:"barbell", reps:p[ei].reps, n:p[ei].n, superset:p[ei].superset};
+      } else {
+        const lib = findInLibrary(sel.value);
+        p[ei] = {name:sel.value, icon:lib?lib.icon:"barbell", reps:lib?lib.reps:p[ei].reps,
+                 n:p[ei].n, superset:p[ei].superset};
+      }
+      savePlan(currentDay, p);
+      renderDay();
+    });
+  });
+
+  list.querySelectorAll("[data-sets]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const p = getPlan(currentDay), i = +btn.dataset.ex;
+      p[i].n = btn.dataset.sets === "plus" ? Math.min(10, p[i].n+1) : Math.max(1, p[i].n-1);
+      savePlan(currentDay, p);
+      renderDay();
+    });
+  });
+
+  list.querySelectorAll("[data-del]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const p = getPlan(currentDay), i = +btn.dataset.del;
+      if(!confirm(`Fjern "${p[i].name}" fra ${PROGRAM[currentDay].label}?\n(Dine gamle tal for øvelsen bevares.)`)) return;
+      p.splice(i,1);
+      savePlan(currentDay, p);
+      renderDay();
     });
   });
 }
 
-function renderAll(){ renderTabs(); renderDay(); }
+document.getElementById("addExBtn").onclick = ()=>{
+  const p = getPlan(currentDay);
+  const first = (LIBRARY[currentDay] || LIBRARY.bryst).items[0];
+  p.push({name:first.name, icon:first.icon, reps:first.reps, n:3});
+  savePlan(currentDay, p);
+  renderDay();
+  window.scrollTo({top:document.body.scrollHeight, behavior:"smooth"});
+};
+
+document.getElementById("restoreBtn").onclick = ()=>{
+  if(!confirm("Gendan standardøvelserne for " + PROGRAM[currentDay].label + "?\n(Dine tal slettes ikke.)")) return;
+  localStorage.removeItem(keyPlan(currentDay));
+  renderDay();
+  showToast("Standardprogram gendannet");
+};
 
 /* ---------- Toast ---------- */
 function showToast(msg){
   const t = document.getElementById("toast");
   t.textContent = msg;
   t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"), 2200);
+  setTimeout(()=>t.classList.remove("show"), 2600);
 }
 
-/* ---------- Reset dagens felter ----------
-   Fjerner kun det du har tastet ind I DAG for denne dag (dags-stemplet data).
-   Ældre gemte tal (fra tidligere træninger) rører den ikke. */
+/* ---------- Gem træning ----------
+   Rykker dagens tal over i de to Sidst-kolonner og tømmer felterne,
+   så du står klar til næste træning. */
+document.getElementById("saveBtn").onclick = ()=>{
+  const log = loadJSON(keyLog(currentDay), {});
+  const plan = getPlan(currentDay);
+  const t = todayISO();
+  let moved = 0;
+
+  plan.forEach(ex=>{
+    for(let si=0; si<ex.n; si++){
+      const e = log[setKey(ex.name, si)];
+      if(e && (has(e.w) || has(e.r))) moved++;
+    }
+  });
+
+  if(!moved){ showToast("Ingen tal at gemme"); return; }
+  if(!confirm(`Gem træningen?\n${moved} sæt rykkes over i "Sidst", og felterne tømmes.`)) return;
+
+  plan.forEach(ex=>{
+    for(let si=0; si<ex.n; si++){
+      const e = log[setKey(ex.name, si)];
+      if(e && (has(e.w) || has(e.r))){
+        e.pw = e.w; e.pr = e.r; e.pd = t;
+        e.w = ""; e.r = ""; e.done = false;
+      }
+    }
+  });
+
+  saveJSON(keyLog(currentDay), log);
+  localStorage.setItem(keySaved(currentDay), t);
+  renderDay();
+  showToast(`Træning gemt ✓ ${moved} sæt ligger nu under Sidst`);
+};
+
+/* ---------- Ryd felterne (historikken røres ikke) ---------- */
 document.getElementById("resetBtn").onclick = ()=>{
-  if(!confirm("Ryd det du har tastet ind i dag for " + PROGRAM[currentDay].label + "?")) return;
-  const log = loadJSON(keyLog(currentDay));
-  const today = todayISO();
-  Object.keys(log).forEach(id=>{ if(log[id].d === today) delete log[id]; });
+  if(!confirm("Ryd det du har tastet ind for " + PROGRAM[currentDay].label + "?\n(Sidst-tallene bevares.)")) return;
+  const log = loadJSON(keyLog(currentDay), {});
+  Object.values(log).forEach(e=>{ if(e){ e.w = ""; e.r = ""; e.done = false; } });
   saveJSON(keyLog(currentDay), log);
   renderDay();
 };
 
-/* ---------- Gem som billede ----------
-   Selve dataen er allerede gemt automatisk løbende - denne knap
-   laver bare et delbart billede af det du har tastet ind lige nu. */
-document.getElementById("saveImgBtn").onclick = async ()=>{
-  const frame = document.getElementById("capture-frame");
-  try{
-    const canvas = await html2canvas(frame, {
-      backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
-      scale: window.devicePixelRatio > 1 ? 2 : 1.5,
-      useCORS: true
-    });
-    const link = document.createElement("a");
-    const stamp = new Date().toISOString().slice(0,10);
-    link.download = `traening-${currentDay}-${stamp}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-
-    showToast("Billede gemt ✓ (tallene er allerede gemt automatisk)");
-  }catch(e){
-    showToast("Kunne ikke gemme billede – prøv igen");
-    console.error(e);
-  }
-};
-
+function renderAll(){ renderTabs(); renderDay(); }
 renderAll();
 </script>
 </body>
